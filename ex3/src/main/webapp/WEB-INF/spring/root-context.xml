@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+		<!-- xml 안에서도 객체로 만들어놓을수 있다
+		 -->
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<!-- 필드에 선언된 이름을 매핑한다 이미 만들어진 필드이다-->
+		<!-- <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="jdbcUrl" value="jdbc:oracle:thin:@localhost:1521:XE"/> -->
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:XE"/>
+		<!-- 키값을 넣어주면 해당 value 를 넣어주면된다 -->
+		<property name="username" value="hr"/>
+		<property name="password" value="hr"/>
+	</bean>	
+	<!-- 히카리 컨피그 데이터소스에 전달을 해줘야 자바에서 사용이 가능해진다 destroy이용해서 반납한다라는ㄷ쓰 -->
+	<bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+		<!--constructor-arg 생성자를 불러오는게 이것이다  -->
+		<constructor-arg ref="hikariConfig"/> <!-- 이친구는 생성자로 받은것이고 -->
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property><!-- 이친구는 세터로 받은것 -->
+		<!-- 실제 빌드가되는 경로 default 경로가 프리픽스가된다 mappers 안에있는 많은폴더중에서 무조건  Mapper.xml찾아서 mapperLocations로 쓰라는 뜻  -->
+		<property name="mapperLocations" value="classpath:mappers/**/*Mapper.xml"/>
+		<property name="configLocation" value="classpath:config/config.xml"/>
+	</bean>
+	<mybatis-spring:scan base-package="com.example.ex02.mapper"/>
+	<!--이렇게되면 com.example.mapper라는곳을 스캔하게된다 -->
+	
+	
+	
+</beans>
